@@ -492,7 +492,7 @@ function Intro({ onComplete }) {
           pointerEvents: "none",
         }}>
           {/* Letters */}
-          <div style={{ display: "flex", alignItems: "center", gap: "clamp(2px,0.5vw,8px)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "clamp(2px,0.5vw,8px)", lineHeight: 1 }}>
             {logoText.split("").map((char, i) => (
               <span key={i} style={{
                 fontFamily: "'Orbitron', sans-serif",
@@ -500,6 +500,7 @@ function Intro({ onComplete }) {
                 fontSize: "clamp(2.8rem,7vw,6.5rem)",
                 color: "#e8f4ff",
                 letterSpacing: "0.12em",
+                lineHeight: 1,
                 opacity: revealedLetters.includes(i) ? 1 : 0,
                 transform: revealedLetters.includes(i)
                   ? "translateY(0) scale(1)"
@@ -516,11 +517,11 @@ function Intro({ onComplete }) {
           </div>
 
           <div style={{
-            marginTop: "1.25rem",
+            marginTop: "2.2rem",
             fontFamily: "'Rajdhani', sans-serif",
-            fontSize: "clamp(12px,1.45vw,16px)",
+            fontSize: "clamp(13px,1.5vw,18px)",
             fontWeight: 600,
-            letterSpacing: "clamp(0.18em,0.7vw,0.46em)",
+            letterSpacing: "clamp(0.22em,0.8vw,0.5em)",
             color: "rgba(190,220,255,0)",
             textTransform: "uppercase",
             textAlign: "center",
@@ -962,13 +963,158 @@ function Achievements() {
 // ─── EVENTS ───────────────────────────────────────────────────────────────────
 function Events() {
   const events = [
-    { title: "NEXUS Hackathon 2025", type: "Hackathon", date: "Mar 15–16, 2025", desc: "36-hour innovation sprint exploring AI and climate tech. 200+ participants, 40+ teams, $5000 prize pool.", status: "Upcoming" },
-    { title: "Prompt Engineering Bootcamp", type: "Workshop", date: "Feb 8, 2025", desc: "Hands-on workshop on advanced LLM prompting, fine-tuning strategies, and building AI-native products.", status: "Upcoming" },
-    { title: "Design Thinking Sprint", type: "Workshop", date: "Jan 20, 2025", desc: "A full-day sprint applying human-centered design to real-world startup challenges with expert mentors.", status: "Recent" },
-    { title: "Web3 & Blockchain Conclave", type: "Seminar", date: "Dec 5, 2024", desc: "Industry leaders explored decentralized applications, smart contracts, and the evolution of Web3.", status: "Past" },
-    { title: "Startup Pitch Night", type: "Event", date: "Nov 22, 2024", desc: "Students pitched venture ideas to a panel of angel investors and startup founders in an electric evening.", status: "Past" },
-    { title: "GenAI Development Workshop", type: "Workshop", date: "Oct 10, 2024", desc: "Technical deep-dive into building production-ready applications using modern generative AI frameworks.", status: "Past" },
-  ];
+  {
+    title: "Curiosity Lab - Project Expo",
+    type: "Project Expo",
+    date: "Apr 24, 2025",
+    desc: "A project showcase event where students presented their ideas and innovations, marking the conclusion of the Curiosity Lab initiative.",
+    status: "Past"
+  },
+
+  {
+    title: "Build&Break: AI Agents",
+    type: "AI Workshop",
+    date: "Jun 24, 2025",
+    desc: "An introductory workshop on AI agents where students explored challenges in AI systems and built simple AI agents hands-on.",
+    status: "Past"
+  },
+
+  {
+    title: "Tailwind Takeoff",
+    type: "Web Development",
+    date: "Jul 26, 2025",
+    desc: "A beginner-friendly session introducing TailwindCSS and practical UI development using HTML and React.",
+    status: "Past"
+  },
+
+  {
+    title: "Promptsmiths - Forge your own AI",
+    type: "AI/LLM Workshop",
+    date: "Aug 18, 2025",
+    desc: "Students learned how language models work and customized their own LLMs using Ollama tools.",
+    status: "Past"
+  },
+
+  {
+    title: "Pixel Laura",
+    type: "Photography Contest",
+    date: "Aug 19, 2025",
+    desc: "A creative photography event designed to encourage participants to showcase their skills through themed challenges.",
+    status: "Past"
+  },
+
+  {
+    title: "Inside the Black Box - How Machines Actually Learn",
+    type: "Machine Learning",
+    date: "Aug 23, 2025",
+    desc: "A session explaining the fundamentals of machine learning and how AI models learn from data.",
+    status: "Past"
+  },
+
+  {
+    title: "Art of Pitching",
+    type: "Soft Skills",
+    date: "Sep 19, 2025",
+    desc: "A workshop focused on improving pitching skills, communication clarity, and judge engagement techniques.",
+    status: "Past"
+  },
+
+  {
+    title: "Renaissance",
+    type: "Club Inauguration",
+    date: "Sep 29, 2025",
+    desc: "The official club inauguration event introducing members, vision, and guest speakers from the industry.",
+    status: "Past"
+  },
+
+  {
+    title: "Docker Demystified",
+    type: "DevOps Workshop",
+    date: "Oct 09, 2025",
+    desc: "A hands-on Docker session teaching students container creation, Dockerfiles, and image management basics.",
+    status: "Past"
+  },
+
+  {
+    title: "QUBIT - World Of Quantum Computing",
+    type: "Quantum Computing",
+    date: "Oct 11, 2025",
+    desc: "A beginner-oriented session simplifying quantum computing concepts and introducing core ideas.",
+    status: "Past"
+  },
+
+  {
+    title: "N8N - Hands on Workshop",
+    type: "Automation Workshop",
+    date: "Oct 12, 2025",
+    desc: "An automation workshop where students built no-code workflows and explored automation fundamentals live.",
+    status: "Past"
+  },
+
+  {
+    title: "IoT Connect",
+    type: "IoT Workshop",
+    date: "Oct 15, 2025",
+    desc: "Participants learned IoT communication protocols and streamed live IoT data through local server setups.",
+    status: "Past"
+  },
+
+  {
+    title: "N8N - Contest",
+    type: "Technical Contest",
+    date: "Oct 22, 2025",
+    desc: "A follow-up contest allowing students to apply and showcase the automation skills learned during the workshop.",
+    status: "Past"
+  },
+
+  {
+    title: "Journey of a Byte",
+    type: "Networking",
+    date: "Nov 29, 2025",
+    desc: "A networking fundamentals session explaining how internet communication works and how data flows online.",
+    status: "Past"
+  },
+
+  {
+    title: "Dec Learnathon - IoT Journey",
+    type: "IoT Learnathon",
+    date: "Dec 01, 2025",
+    desc: "Students explored electronics basics, IoT concepts, and created live simulations using Tinkercad and Wokwi.",
+    status: "Past"
+  },
+
+  {
+    title: "Dec Learnathon - Power of FlutterFlow",
+    type: "App Development",
+    date: "Dec 09, 2025",
+    desc: "A no-code app development session teaching participants to build real, functional apps using FlutterFlow.",
+    status: "Past"
+  },
+
+  {
+    title: "Dec Learnathon - Boot into Linux",
+    type: "Linux Workshop",
+    date: "Dec 15, 2025",
+    desc: "A Linux fundamentals workshop introducing virtual machines, command-line tools, and core Linux concepts.",
+    status: "Past"
+  },
+
+  {
+    title: "Dec Learnathon - Detect-A-Thon",
+    type: "Computer Vision",
+    date: "Dec 21, 2025",
+    desc: "A computer vision session where students explored datasets, object detection models, and real-time training workflows.",
+    status: "Past"
+  },
+
+  {
+    title: "Web Launch – Build & Launch Your Website using WordPress",
+    type: "Web Development",
+    date: "Mar 15, 2026",
+    desc: "A no-code website development workshop where students learned to create and launch websites using WordPress, along with basics of free hosting and subdomains.",
+    status: "Past"
+  }
+];
 
   const statusColor = { Upcoming: "rgba(80,200,120,0.85)", Recent: "rgba(100,160,255,0.85)", Past: "rgba(140,140,160,0.7)" };
 
@@ -1059,10 +1205,10 @@ function EventCard({ ev, statusColor }) {
 // ─── TEAM ─────────────────────────────────────────────────────────────────────
 function Team() {
   const coreTeam = [
-    { name: "Arjun Mehra", role: "President", initials: "AM" },
-    { name: "Sneha Pillai", role: "Vice President", initials: "SP" },
-    { name: "Karthik Rajan", role: "Technical Lead", initials: "KR" },
-    { name: "Divya Nair", role: "Design Lead", initials: "DN" },
+    { name: "Amrithavarshini", role: "Mentor", initials: "AV" },
+    { name: "Afra Zeenath Fathima", role: "President", initials: "AZF" },
+    { name: "Sarvesh Sivasankaran", role: "Vice President", initials: "SV" },
+    { name: "Jaeyalakshmi", role: "Faculty Coordinator", initials: "JL" },
   ];
   const leads = [
     { name: "Rahul Sharma", role: "AI & ML Chapter", initials: "RS" },
@@ -1071,6 +1217,69 @@ function Team() {
     { name: "Nikhil Das", role: "Research & Dev", initials: "ND" },
     { name: "Meera Iyer", role: "Events & Outreach", initials: "MI" },
     { name: "Sanjay Patel", role: "Operations", initials: "SP" },
+  ];
+  const members = [
+    { name: "Bharathwaj S", role: "Content", initials: "BS" },
+    { name: "Nishanth V C", role: "Content", initials: "NVC" },
+    { name: "Bert Gawin D", role: "Content", initials: "BGD" },
+    { name: "Parkavi", role: "Content", initials: "P" },
+
+    { name: "Krishnapriya Bala", role: "WIE", initials: "KB" },
+    { name: "Shri Varshini", role: "WIE", initials: "SV" },
+    { name: "Megaasri", role: "WIE", initials: "M" },
+
+    { name: "RA Karthikha", role: "Media", initials: "RAK" },
+    { name: "Rahul M A", role: "Media", initials: "RMA" },
+    { name: "Darshan S", role: "Media", initials: "DS" },
+    { name: "Dhanush", role: "Media", initials: "D" },
+
+    { name: "Rohit SS", role: "Info-sec", initials: "RSS" },
+    { name: "Subin", role: "Info-sec", initials: "S" },
+    { name: "Nikitha", role: "Info-sec", initials: "N" },
+
+    { name: "Arya MR", role: "PR", initials: "AMR" },
+    { name: "Mahesh D", role: "PR", initials: "MD" },
+
+    { name: "Kaaviya Sri PS", role: "Creative", initials: "KSPS" },
+    { name: "Varsha", role: "Creative", initials: "V" },
+    { name: "Nithin R", role: "Creative", initials: "NR" },
+
+    { name: "Meer Nadeemudeen", role: "DSA", initials: "MN" },
+    { name: "Kaviarasi", role: "DSA", initials: "K" },
+    { name: "Harish", role: "DSA", initials: "H" },
+
+    { name: "Akash D", role: "Event", initials: "AD" },
+    { name: "Vijayalakshmi", role: "Event", initials: "V" },
+    { name: "Sangita", role: "Event", initials: "S" },
+    { name: "Mithul", role: "Event", initials: "M" },
+    { name: "Lakshana", role: "Event", initials: "L" },
+    { name: "Andralyn Sweety", role: "Event", initials: "AS" },
+
+    { name: "Shajith", role: "Design", initials: "S" },
+    { name: "Tamilselvan", role: "Design", initials: "T" },
+    { name: "Thiagarajan", role: "Design", initials: "TH" },
+    { name: "Eathisha", role: "Design", initials: "E" },
+
+    { name: "Harish Govind B", role: "AI", initials: "HGB" },
+    { name: "Siddhartha B", role: "AI", initials: "SB" },
+    { name: "Abbas", role: "AI", initials: "A" },
+
+    { name: "H Vikash", role: "Web Frontend", initials: "HV" },
+    { name: "Rohith Kumar S", role: "Web Frontend", initials: "RKS" },
+    { name: "Gurunethra", role: "Web Frontend", initials: "G" },
+
+    { name: "Muthuraj", role: "Web Backend", initials: "M" },
+    { name: "Sarveshwaran D", role: "Web Backend", initials: "SD" },
+
+    { name: "Srisanjay", role: "IoT", initials: "S" },
+    { name: "Deepak Kumar", role: "IoT", initials: "DK" },
+    { name: "Vishnu Prasath P", role: "IoT", initials: "VPP" },
+
+    { name: "Venkat Badhrinarayanan PV", role: "App", initials: "VBPV" },
+    { name: "Vineeth P", role: "App", initials: "VP" },
+    { name: "Fathina Begum B", role: "App", initials: "FBB" },
+
+    { name: "Siddharth RR", role: "Quantum", initials: "SRR" }
   ];
 
   return (
@@ -1102,6 +1311,37 @@ function Team() {
         </Reveal>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px,1fr))", gap: "16px" }}>
           {leads.map((m, i) => <Reveal key={i} delay={i * 0.07}><MemberCard m={m} /></Reveal>)}
+        </div>
+        {/* MEMBERS */}
+        <Reveal delay={0.05}>
+          <div
+            style={{
+              fontFamily: "'Rajdhani', sans-serif",
+              fontSize: "11px",
+              letterSpacing: "0.35em",
+              textTransform: "uppercase",
+              color: "rgba(130,180,255,0.5)",
+              marginBottom: "32px",
+              marginTop: "80px",
+              textAlign: "center"
+            }}
+          >
+            Members
+          </div>
+        </Reveal>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(170px,1fr))",
+            gap: "14px"
+          }}
+        >
+          {members.map((m, i) => (
+            <Reveal key={i} delay={i * 0.03}>
+              <MemberCard m={m} />
+            </Reveal>
+          ))}
         </div>
       </div>
     </section>
@@ -1212,10 +1452,9 @@ function Contact() {
         <Reveal delay={0.05}>
           <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: "24px", marginBottom: "48px" }}>
             {[
-              { label: "Email", value: "hello@intellexa.club" },
-              { label: "Instagram", value: "@intellexa_club" },
-              { label: "LinkedIn", value: "INTELLEXA Club" },
-              { label: "Location", value: "Chennai, India" },
+              { label: "Instagram", value: "@intellexa.rec" },
+              { label: "LinkedIn", value: "Intellexa REC" },
+              { label: "Youtube", value: "INTELLEXA REC" },
             ].map((c, i) => (
               <div key={i} style={{ textAlign: "center" }}>
                 <div style={{ fontFamily: "'Rajdhani', sans-serif", fontSize: "10px", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(100,150,255,0.6)", marginBottom: "4px" }}>{c.label}</div>
