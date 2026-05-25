@@ -1210,70 +1210,6 @@ function Team() {
     { name: "Sarvesh Sivasankaran", role: "Vice President", initials: "SV" },
     { name: "Jaeyalakshmi", role: "Faculty Coordinator", initials: "JL" },
   ];
-  
-  const members = [
-    { name: "Bharathwaj S", role: "Content", initials: "BS" },
-    { name: "Nishanth V C", role: "Content", initials: "NVC" },
-    { name: "Bert Gawin D", role: "Content", initials: "BGD" },
-    { name: "Parkavi", role: "Content", initials: "P" },
-
-    { name: "Krishnapriya Bala", role: "WIE", initials: "KB" },
-    { name: "Shri Varshini", role: "WIE", initials: "SV" },
-    { name: "Megaasri", role: "WIE", initials: "M" },
-
-    { name: "RA Karthikha", role: "Media", initials: "RAK" },
-    { name: "Rahul M A", role: "Media", initials: "RMA" },
-    { name: "Darshan S", role: "Media", initials: "DS" },
-    { name: "Dhanush", role: "Media", initials: "D" },
-
-    { name: "Rohit SS", role: "Info-sec", initials: "RSS" },
-    { name: "Subin", role: "Info-sec", initials: "S" },
-    { name: "Nikitha", role: "Info-sec", initials: "N" },
-
-    { name: "Arya MR", role: "PR", initials: "AMR" },
-    { name: "Mahesh D", role: "PR", initials: "MD" },
-
-    { name: "Kaaviya Sri PS", role: "Creative", initials: "KSPS" },
-    { name: "Varsha", role: "Creative", initials: "V" },
-    { name: "Nithin R", role: "Creative", initials: "NR" },
-
-    { name: "Meer Nadeemudeen", role: "DSA", initials: "MN" },
-    { name: "Kaviarasi", role: "DSA", initials: "K" },
-    { name: "Harish", role: "DSA", initials: "H" },
-
-    { name: "Akash D", role: "Event", initials: "AD" },
-    { name: "Vijayalakshmi", role: "Event", initials: "V" },
-    { name: "Sangita", role: "Event", initials: "S" },
-    { name: "Mithul", role: "Event", initials: "M" },
-    { name: "Lakshana", role: "Event", initials: "L" },
-    { name: "Andralyn Sweety", role: "Event", initials: "AS" },
-
-    { name: "Shajith", role: "Design", initials: "S" },
-    { name: "Tamilselvan", role: "Design", initials: "T" },
-    { name: "Thiagarajan", role: "Design", initials: "TH" },
-    { name: "Eathisha", role: "Design", initials: "E" },
-
-    { name: "Harish Govind B", role: "AI", initials: "HGB" },
-    { name: "Siddhartha B", role: "AI", initials: "SB" },
-    { name: "Abbas", role: "AI", initials: "A" },
-
-    { name: "H Vikash", role: "Web Frontend", initials: "HV" },
-    { name: "Rohith Kumar S", role: "Web Frontend", initials: "RKS" },
-    { name: "Gurunethra", role: "Web Frontend", initials: "G" },
-
-    { name: "Muthuraj", role: "Web Backend", initials: "M" },
-    { name: "Sarveshwaran D", role: "Web Backend", initials: "SD" },
-
-    { name: "Srisanjay", role: "IoT", initials: "S" },
-    { name: "Deepak Kumar", role: "IoT", initials: "DK" },
-    { name: "Vishnu Prasath P", role: "IoT", initials: "VPP" },
-
-    { name: "Venkat Badhrinarayanan PV", role: "App", initials: "VBPV" },
-    { name: "Vineeth P", role: "App", initials: "VP" },
-    { name: "Fathina Begum B", role: "App", initials: "FBB" },
-
-    { name: "Siddharth RR", role: "Quantum", initials: "SRR" }
-  ];
 
   return (
     <section id="team" style={{ position: "relative", padding: "clamp(80px,12vh,160px) clamp(20px,6vw,80px)", overflow: "hidden" }}>
@@ -1297,38 +1233,6 @@ function Team() {
         </Reveal>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px,1fr))", gap: "20px", marginBottom: "64px" }}>
           {coreTeam.map((m, i) => <Reveal key={i} delay={i * 0.1}><MemberCard m={m} highlight /></Reveal>)}
-        </div>
-
-        {/* MEMBERS */}
-        <Reveal delay={0.05}>
-          <div
-            style={{
-              fontFamily: "'Rajdhani', sans-serif",
-              fontSize: "11px",
-              letterSpacing: "0.35em",
-              textTransform: "uppercase",
-              color: "rgba(130,180,255,0.5)",
-              marginBottom: "32px",
-              marginTop: "80px",
-              textAlign: "center"
-            }}
-          >
-            Members
-          </div>
-        </Reveal>
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(170px,1fr))",
-            gap: "14px"
-          }}
-        >
-          {members.map((m, i) => (
-            <Reveal key={i} delay={i * 0.03}>
-              <MemberCard m={m} />
-            </Reveal>
-          ))}
         </div>
       </div>
     </section>
