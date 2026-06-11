@@ -963,6 +963,7 @@ function Achievements() {
 
 // ─── EVENTS ───────────────────────────────────────────────────────────────────
 function Events() {
+  const [activeTab, setActiveTab] = useState("Past");
   const events = [
   {
     title: "Curiosity Lab - Project Expo",
@@ -1117,6 +1118,8 @@ function Events() {
   }
 ];
 
+  const tabs = ["Past", "Upcoming"];
+  const visibleEvents = events.filter((event) => event.status === activeTab);
   const statusColor = { Upcoming: "rgba(80,200,120,0.85)", Recent: "rgba(100,160,255,0.85)", Past: "rgba(140,140,160,0.7)" };
 
   return (
@@ -1136,12 +1139,67 @@ function Events() {
           </div>
         </Reveal>
 
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: "40px" }}>
+          <div style={{
+            display: "inline-flex",
+            padding: "6px",
+            gap: "6px",
+            borderRadius: "999px",
+            background: "rgba(255,255,255,0.04)",
+            border: "1px solid rgba(100,150,255,0.16)",
+            backdropFilter: "blur(18px)",
+          }}>
+            {tabs.map((tab) => {
+              const isActive = activeTab === tab;
+              return (
+                <button
+                  key={tab}
+                  type="button"
+                  onClick={() => setActiveTab(tab)}
+                  style={{
+                    padding: "10px 20px",
+                    borderRadius: "999px",
+                    border: "1px solid transparent",
+                    background: isActive ? "linear-gradient(135deg, rgba(80,120,255,0.28), rgba(80,120,255,0.12))" : "transparent",
+                    color: isActive ? "rgba(230,240,255,0.95)" : "rgba(160,190,235,0.7)",
+                    fontFamily: "'Rajdhani', sans-serif",
+                    fontSize: "13px",
+                    fontWeight: 700,
+                    letterSpacing: "0.2em",
+                    textTransform: "uppercase",
+                    cursor: "pointer",
+                    transition: "all 0.25s ease",
+                    boxShadow: isActive ? "0 8px 24px rgba(30,60,140,0.22)" : "none",
+                  }}
+                >
+                  {tab}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "20px" }}>
-          {events.map((ev, i) => (
+          {visibleEvents.length > 0 ? visibleEvents.map((ev, i) => (
             <Reveal key={i} delay={i * 0.08}>
               <EventCard ev={ev} statusColor={statusColor} />
             </Reveal>
-          ))}
+          )) : (
+            <div style={{
+              gridColumn: "1 / -1",
+              textAlign: "center",
+              padding: "48px 24px",
+              border: "1px solid rgba(100,150,255,0.15)",
+              borderRadius: "8px",
+              background: "rgba(255,255,255,0.03)",
+              backdropFilter: "blur(20px)",
+              color: "rgba(160,190,235,0.75)",
+              fontFamily: "'Rajdhani', sans-serif",
+              fontSize: "16px",
+            }}>
+              No upcoming events scheduled yet.
+            </div>
+          )}
         </div>
       </div>
     </section>
@@ -1242,22 +1300,39 @@ function Team() {
 
 function MemberCard({ m, highlight }) {
   const [hovered, setHovered] = useState(false);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const avatarColors = ["rgba(60,100,255,0.5)", "rgba(80,50,200,0.5)", "rgba(30,120,200,0.5)", "rgba(50,160,180,0.5)", "rgba(100,60,220,0.5)", "rgba(40,100,180,0.5)"];
   const color = avatarColors[m.initials.charCodeAt(0) % avatarColors.length];
 
+  const handleMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientY - rect.top) / rect.height - 0.5) * 12;
+    const y = -((e.clientX - rect.left) / rect.width - 0.5) * 12;
+    setTilt({ x, y });
+  };
+
   return (
     <div
+      onMouseMove={handleMove}
       onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      onMouseLeave={() => {
+        setHovered(false);
+        setTilt({ x: 0, y: 0 });
+      }}
       style={{
         background: "rgba(255,255,255,0.03)",
-        border: `1px solid ${hovered ? "rgba(100,150,255,0.4)" : "rgba(100,150,255,0.13)"}`,
+        border: `1px solid ${hovered ? "rgba(100,150,255,0.35)" : "rgba(100,150,255,0.13)"}`,
         borderRadius: "8px", padding: "28px 20px",
         backdropFilter: "blur(20px)",
         textAlign: "center",
-        transform: hovered ? "translateY(-6px)" : "translateY(0)",
-        transition: "all 0.35s cubic-bezier(.16,1,.3,1)",
+        transform: `perspective(600px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateY(${hovered ? -4 : 0}px)`,
+        transition: "transform 0.25s ease, border-color 0.3s",
         position: "relative", overflow: "hidden",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        minHeight: "300px",
+        height: "100%",
       }}
     >
       {hovered && (
@@ -1273,27 +1348,29 @@ function MemberCard({ m, highlight }) {
         </div>
       )}
 
-      <div style={{
-        width: highlight ? "72px" : "60px",
-        height: highlight ? "72px" : "60px",
-        borderRadius: "50%", margin: "0 auto 16px",
-        background: color,
-        border: `2px solid ${hovered ? "rgba(150,200,255,0.6)" : "rgba(100,150,255,0.25)"}`,
-        display: "flex", alignItems: "center", justifyContent: "center",
-        fontFamily: "'Orbitron', sans-serif",
-        fontSize: highlight ? "18px" : "15px", fontWeight: 700,
-        color: "rgba(220,235,255,0.9)",
-        transition: "border-color 0.3s",
-        boxShadow: hovered ? `0 0 20px ${color}` : "none",
-        position: "relative",
-      }}>
-        {m.initials}
+      <div>
+        <div style={{
+          width: highlight ? "72px" : "60px",
+          height: highlight ? "72px" : "60px",
+          borderRadius: "50%", margin: "0 auto 16px",
+          background: color,
+          border: `2px solid ${hovered ? "rgba(150,200,255,0.6)" : "rgba(100,150,255,0.25)"}`,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontFamily: "'Orbitron', sans-serif",
+          fontSize: highlight ? "18px" : "15px", fontWeight: 700,
+          color: "rgba(220,235,255,0.9)",
+          transition: "border-color 0.3s",
+          boxShadow: hovered ? `0 0 20px ${color}` : "none",
+          position: "relative",
+        }}>
+          {m.initials}
+        </div>
+
+        <div style={{ fontFamily: "'Orbitron', sans-serif", fontSize: highlight ? "14px" : "12px", fontWeight: 600, color: "rgba(220,235,255,0.9)", marginBottom: "6px", letterSpacing: "0.04em" }}>{m.name}</div>
+        <div style={{ fontFamily: "'Rajdhani', sans-serif", fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(130,180,255,0.6)" }}>{m.role}</div>
       </div>
 
-      <div style={{ fontFamily: "'Orbitron', sans-serif", fontSize: highlight ? "14px" : "12px", fontWeight: 600, color: "rgba(220,235,255,0.9)", marginBottom: "6px", letterSpacing: "0.04em" }}>{m.name}</div>
-      <div style={{ fontFamily: "'Rajdhani', sans-serif", fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(130,180,255,0.6)" }}>{m.role}</div>
-
-      <div style={{ display: "flex", justifyContent: "center", gap: "12px", marginTop: "14px" }}>
+      <div style={{ display: "flex", justifyContent: "center", gap: "12px", marginTop: "20px" }}>
         {["in", "gh", "tw"].map((s, i) => (
           <div key={i} className="clickable" style={{
             width: "26px", height: "26px", borderRadius: "50%",
