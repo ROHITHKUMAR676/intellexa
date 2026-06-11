@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import CustomCursor from "./components/CustomCursor";
 
 // ─── Utility: hook for scroll-triggered reveal ────────────────────────────────
 function useInView(threshold = 0.15) {
@@ -597,7 +598,7 @@ function Navbar({ visible }) {
       opacity: visible ? 1 : 0,
       transform: visible ? "translateY(0)" : "translateY(-20px)",
     }}>
-      <div style={{
+      <div className="clickable" style={{
         fontFamily: "'Orbitron', sans-serif", fontSize: "18px", fontWeight: 700,
         letterSpacing: "0.15em",
         color: "transparent",
@@ -1294,7 +1295,7 @@ function MemberCard({ m, highlight }) {
 
       <div style={{ display: "flex", justifyContent: "center", gap: "12px", marginTop: "14px" }}>
         {["in", "gh", "tw"].map((s, i) => (
-          <div key={i} style={{
+          <div key={i} className="clickable" style={{
             width: "26px", height: "26px", borderRadius: "50%",
             background: "rgba(80,120,255,0.1)", border: "1px solid rgba(80,120,255,0.2)",
             display: "flex", alignItems: "center", justifyContent: "center",
@@ -1455,31 +1456,7 @@ function Footer() {
   );
 }
 
-// ─── CURSOR ──────────────────────────────────────────────────────────────────
-function CustomCursor() {
-  const [pos, setPos] = useState({ x: -100, y: -100 });
-  const [trail, setTrail] = useState({ x: -100, y: -100 });
-  const posRef = useRef({ x: -100, y: -100 });
-
-  useEffect(() => {
-    const move = (e) => { posRef.current = { x: e.clientX, y: e.clientY }; setPos({ x: e.clientX, y: e.clientY }); };
-    window.addEventListener("mousemove", move);
-    let raf;
-    function lerp() {
-      setTrail(prev => ({ x: prev.x + (posRef.current.x - prev.x) * 0.12, y: prev.y + (posRef.current.y - prev.y) * 0.12 }));
-      raf = requestAnimationFrame(lerp);
-    }
-    raf = requestAnimationFrame(lerp);
-    return () => { window.removeEventListener("mousemove", move); cancelAnimationFrame(raf); };
-  }, []);
-
-  return (
-    <>
-      <div style={{ position: "fixed", left: pos.x - 4, top: pos.y - 4, width: "8px", height: "8px", borderRadius: "50%", background: "rgba(200,225,255,0.9)", pointerEvents: "none", zIndex: 9999, mixBlendMode: "screen", transition: "transform 0.1s" }} />
-      <div style={{ position: "fixed", left: trail.x - 18, top: trail.y - 18, width: "36px", height: "36px", borderRadius: "50%", border: "1px solid rgba(100,160,255,0.4)", pointerEvents: "none", zIndex: 9998 }} />
-    </>
-  );
-}
+// Cursor is provided by `src/components/CustomCursor.jsx` (imported at top)
 
 // ─── ROOT APP ─────────────────────────────────────────────────────────────────
 export default function App() {
@@ -1496,13 +1473,16 @@ export default function App() {
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; cursor: none !important; }
         html { scroll-behavior: smooth; }
         body {
           background: #02040e;
           color: rgba(200,220,255,0.85);
           overflow-x: hidden;
           cursor: none;
+        }
+        a, button, input, textarea, select, label, [role='button'], .clickable {
+          cursor: none !important;
         }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: #02040e; }

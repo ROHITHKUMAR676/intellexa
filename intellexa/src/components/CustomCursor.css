@@ -1,0 +1,49 @@
+.orbit-cursor {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 99999;
+  display: none;
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+}
+
+.orbit-cursor__lottie {
+  position: absolute;
+  width: 96px;
+  height: 96px;
+  margin-left: -48px;
+  margin-top: -48px;
+  pointer-events: none;
+  transition: transform 0.15s ease;
+}
+
+.orbit-cursor.cursor--hover .orbit-cursor__lottie {
+  transform: scale(1.18);
+}
+
+.orbit-cursor.cursor--active .orbit-cursor__lottie {
+  transform: scale(0.88);
+}
+
+/* SPARKS */
+.space-spark {
+  position: fixed;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 0 8px white, 0 0 20px cyan;
+  animation: spark-burst 1s forwards;
+}
+
+@keyframes spark-burst {
+  from {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(var(--dx), var(--dy)) scale(0.2);
+  }
+}
