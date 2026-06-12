@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import CustomCursor from "./components/CustomCursor";
 
+const cardTransition = "transform 0.25s ease, border-color 0.3s, background 0.3s";
+
 // ─── Utility: hook for scroll-triggered reveal ────────────────────────────────
 function useInView(threshold = 0.15) {
   const ref = useRef(null);
@@ -810,28 +812,30 @@ function About() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "20px", marginBottom: "80px" }}>
           {pillars.map((p, i) => (
             <Reveal key={i} delay={i * 0.12}>
-              <div style={{
-                background: "rgba(255,255,255,0.03)",
-                border: "1px solid rgba(100,150,255,0.15)",
-                borderRadius: "8px", padding: "36px 28px",
-                minHeight: "300px",
-                height: "100%",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                textAlign: "center",
-                backdropFilter: "blur(20px)",
-                transition: "border-color 0.3s, transform 0.3s, background 0.3s",
-                cursor: "default",
-              }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(100,150,255,0.4)"; e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.background = "rgba(255,255,255,0.05)"; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(100,150,255,0.15)"; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.background = "rgba(255,255,255,0.03)"; }}
+              <HoverCard
+                style={{
+                  background: "rgba(255,255,255,0.03)",
+                  border: "1px solid transparent",
+                  borderRadius: "8px", padding: "36px 28px",
+                  minHeight: "300px",
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  textAlign: "center",
+                  backdropFilter: "blur(20px)",
+                  cursor: "default",
+                }}
+                hoverStyle={{
+                  background: "rgba(255,255,255,0.05)",
+                }}
+                particleColor="rgba(150,200,255,0.42)"
               >
                 <div style={{ fontSize: "28px", marginBottom: "16px", color: "rgba(140,190,255,0.8)" }}>{p.icon}</div>
                 <h3 style={{ fontFamily: "'Orbitron', sans-serif", fontSize: "16px", fontWeight: 600, color: "rgba(220,235,255,0.9)", marginBottom: "12px", letterSpacing: "0.06em" }}>{p.title}</h3>
                 <p style={{ fontFamily: "'Rajdhani', sans-serif", fontSize: "15px", lineHeight: 1.7, color: "rgba(160,200,255,0.65)", margin: 0, fontWeight: 400 }}>{p.desc}</p>
-              </div>
+              </HoverCard>
             </Reveal>
           ))}
         </div>
@@ -926,18 +930,20 @@ function Achievements() {
                     boxShadow: "0 0 12px rgba(100,150,255,0.8)",
                   }} />
 
-                  <div style={{
-                    width: "calc(50% - 36px)",
-                    background: "rgba(255,255,255,0.03)",
-                    border: "1px solid rgba(100,150,255,0.15)",
-                    borderRadius: "8px",
-                    padding: "24px 24px",
-                    backdropFilter: "blur(20px)",
-                    transition: "border-color 0.3s, transform 0.3s",
-                    cursor: "default",
-                  }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(100,150,255,0.4)"; e.currentTarget.style.transform = "translateY(-3px)"; }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(100,150,255,0.15)"; e.currentTarget.style.transform = "translateY(0)"; }}
+                  <HoverCard
+                    style={{
+                      width: "calc(50% - 36px)",
+                      background: "rgba(255,255,255,0.03)",
+                      border: "1px solid transparent",
+                      borderRadius: "8px",
+                      padding: "24px 24px",
+                      backdropFilter: "blur(20px)",
+                      cursor: "default",
+                    }}
+                    hoverStyle={{
+                      background: "rgba(255,255,255,0.05)",
+                    }}
+                    particleColor="rgba(150,200,255,0.36)"
                   >
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "10px", flexWrap: "wrap", gap: "8px" }}>
                       <span style={{
@@ -950,7 +956,7 @@ function Achievements() {
                     </div>
                     <h3 style={{ fontFamily: "'Orbitron', sans-serif", fontSize: "14px", fontWeight: 600, color: "rgba(220,235,255,0.9)", margin: "0 0 10px", letterSpacing: "0.04em" }}>{item.title}</h3>
                     <p style={{ fontFamily: "'Rajdhani', sans-serif", fontSize: "14px", lineHeight: 1.65, color: "rgba(150,190,255,0.6)", margin: 0 }}>{item.desc}</p>
-                  </div>
+                  </HoverCard>
                 </div>
               </Reveal>
             );
@@ -958,6 +964,61 @@ function Achievements() {
         </div>
       </div>
     </section>
+  );
+}
+
+function HoverCard({ children, style, hoverStyle = {}, particleColor = "rgba(150,200,255,0.4)" }) {
+  const [hovered, setHovered] = useState(false);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+
+  const handleMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientY - rect.top) / rect.height - 0.5) * 12;
+    const y = -((e.clientX - rect.left) / rect.width - 0.5) * 12;
+    setTilt({ x, y });
+  };
+
+  return (
+    <div
+      onMouseMove={handleMove}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => {
+        setHovered(false);
+        setTilt({ x: 0, y: 0 });
+      }}
+      style={{
+        ...style,
+        transform: `perspective(600px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateY(${hovered ? -4 : 0}px)`,
+        transition: cardTransition,
+        borderColor: hovered && hoverStyle.borderColor ? hoverStyle.borderColor : style.borderColor,
+        background: hovered && hoverStyle.background ? hoverStyle.background : style.background,
+        boxShadow: hovered ? `0 0 20px ${particleColor}` : "none",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      {hovered && (
+        <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
+          {Array.from({ length: 12 }, (_, i) => (
+            <div
+              key={i}
+              style={{
+                position: "absolute",
+                left: `${10 + (i * 37) % 80}%`,
+                top: `${5 + (i * 53) % 90}%`,
+                width: "2px",
+                height: "2px",
+                borderRadius: "50%",
+                background: particleColor,
+              }}
+            />
+          ))}
+        </div>
+      )}
+      <div style={{ position: "relative", zIndex: 1, height: "100%", width: "100%" }}>
+        {children}
+      </div>
+    </div>
   );
 }
 
@@ -1224,12 +1285,13 @@ function EventCard({ ev, statusColor }) {
         borderRadius: "8px", padding: "28px 24px",
         backdropFilter: "blur(20px)",
         transform: `perspective(600px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
-        transition: "transform 0.25s ease, border-color 0.3s",
+        transition: cardTransition,
         cursor: "default",
         display: "flex", flexDirection: "column",
+        background: "rgba(255,255,255,0.03)",
       }}
-      onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(100,150,255,0.35)"}
-      onMouseLeave={e => e.currentTarget.style.borderColor = "rgba(100,150,255,0.15)"}
+      onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(100,150,255,0.35)"; e.currentTarget.style.background = "rgba(255,255,255,0.05)"; }}
+      onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(100,150,255,0.15)"; e.currentTarget.style.background = "rgba(255,255,255,0.03)"; }}
     >
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", flexWrap: "wrap", gap: "8px" }}>
         <span style={{
@@ -1265,9 +1327,9 @@ function EventCard({ ev, statusColor }) {
 function Team() {
   const coreTeam = [
     { name: "Amrithavarshini", role: "Mentor", initials: "AV" },
+    { name: "Alfred Sam", role: "Mentor", initials: "AS" },
     { name: "Afra Zeenath Fathima", role: "President", initials: "AZF" },
     { name: "Sarvesh Sivasankaran", role: "Vice President", initials: "SV" },
-    { name: "Jaeyalakshmi", role: "Faculty Coordinator", initials: "JL" },
   ];
 
   return (
@@ -1326,13 +1388,14 @@ function MemberCard({ m, highlight }) {
         backdropFilter: "blur(20px)",
         textAlign: "center",
         transform: `perspective(600px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateY(${hovered ? -4 : 0}px)`,
-        transition: "transform 0.25s ease, border-color 0.3s",
+        transition: cardTransition,
         position: "relative", overflow: "hidden",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
         minHeight: "300px",
         height: "100%",
+        background: hovered ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.03)",
       }}
     >
       {hovered && (

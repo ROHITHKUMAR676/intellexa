@@ -22,28 +22,24 @@
   transform: scale(1.18);
 }
 
-.orbit-cursor.cursor--active .orbit-cursor__lottie {
-  transform: scale(0.88);
-}
-
-/* SPARKS */
-.space-spark {
-  position: fixed;
-  width: 5px;
-  height: 5px;
+.orbit-cursor__dot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  margin-left: -5px;
+  margin-top: -5px;
   border-radius: 50%;
-  background: white;
-  box-shadow: 0 0 8px white, 0 0 20px cyan;
-  animation: spark-burst 1s forwards;
+  background: #ffffff;
+  box-shadow: 0 0 10px rgba(180, 240, 255, 0.95), 0 0 18px rgba(80, 180, 255, 0.65);
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity 0.14s ease, transform 0.14s ease;
 }
 
-@keyframes spark-burst {
-  from {
-    opacity: 1;
-    transform: translate(0, 0) scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: translate(var(--dx), var(--dy)) scale(0.2);
-  }
+.orbit-cursor.cursor--hover .orbit-cursor__dot {
+  opacity: 1;
+  transform: scale(1);
 }
+
