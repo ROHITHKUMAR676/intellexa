@@ -1,7 +1,4 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import CustomCursor from "./components/CustomCursor";
-
-const cardTransition = "transform 0.25s ease, border-color 0.3s, background 0.3s";
 
 // ─── Utility: hook for scroll-triggered reveal ────────────────────────────────
 function useInView(threshold = 0.15) {
@@ -120,6 +117,81 @@ function Reveal({ children, delay = 0, className = "" }) {
       transform: inView ? "translateY(0)" : "translateY(48px)",
       transition: `opacity 1.1s cubic-bezier(.16,1,.3,1) ${delay}s, transform 1.1s cubic-bezier(.16,1,.3,1) ${delay}s`,
     }}>
+      {children}
+    </div>
+  );
+}
+
+function InteractiveCard({
+  children,
+  style = {},
+  lift = -6,
+  tilt = true,
+  showParticles = true,
+  onMouseEnter,
+  onMouseLeave,
+  onHoverChange,
+}) {
+  const [hovered, setHovered] = useState(false);
+  const [tiltState, setTiltState] = useState({ x: 0, y: 0 });
+
+  const handleMove = (e) => {
+    if (!tilt) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientY - rect.top) / rect.height - 0.5) * 12;
+    const y = -((e.clientX - rect.left) / rect.width - 0.5) * 12;
+    setTiltState({ x, y });
+  };
+
+  const handleEnter = (e) => {
+    setHovered(true);
+    onHoverChange && onHoverChange(true);
+    onMouseEnter && onMouseEnter(e);
+  };
+
+  const handleLeave = (e) => {
+    setHovered(false);
+    setTiltState({ x: 0, y: 0 });
+    onHoverChange && onHoverChange(false);
+    onMouseLeave && onMouseLeave(e);
+  };
+
+  return (
+    <div
+      onMouseEnter={handleEnter}
+      onMouseLeave={handleLeave}
+      onMouseMove={handleMove}
+      style={{
+        background: "rgba(255,255,255,0.03)",
+        border: `1px solid ${hovered ? "rgba(100,150,255,0.4)" : "rgba(100,150,255,0.15)"}`,
+        borderRadius: "8px",
+        backdropFilter: "blur(20px)",
+        transform: `perspective(600px) rotateX(${tiltState.x}deg) rotateY(${tiltState.y}deg) translateY(${hovered ? `${lift}px` : "0"})`,
+        transition: "all 0.35s cubic-bezier(.16,1,.3,1)",
+        cursor: "default",
+        position: "relative",
+        overflow: "hidden",
+        ...style,
+      }}
+    >
+      {showParticles && hovered && (
+        <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
+          {Array.from({ length: 12 }, (_, i) => (
+            <div
+              key={i}
+              style={{
+                position: "absolute",
+                left: `${10 + (i * 37) % 80}%`,
+                top: `${5 + (i * 53) % 90}%`,
+                width: "2px",
+                height: "2px",
+                borderRadius: "50%",
+                background: "rgba(150,200,255,0.4)",
+              }}
+            />
+          ))}
+        </div>
+      )}
       {children}
     </div>
   );
@@ -812,30 +884,20 @@ function About() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "20px", marginBottom: "80px" }}>
           {pillars.map((p, i) => (
             <Reveal key={i} delay={i * 0.12}>
-              <HoverCard
-                style={{
-                  background: "rgba(255,255,255,0.03)",
-                  border: "1px solid transparent",
-                  borderRadius: "8px", padding: "36px 28px",
-                  minHeight: "300px",
-                  height: "100%",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  textAlign: "center",
-                  backdropFilter: "blur(20px)",
-                  cursor: "default",
-                }}
-                hoverStyle={{
-                  background: "rgba(255,255,255,0.05)",
-                }}
-                particleColor="rgba(150,200,255,0.42)"
-              >
+              <InteractiveCard style={{
+                minHeight: "300px",
+                height: "100%",
+                padding: "36px 28px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                textAlign: "center",
+              }}>
                 <div style={{ fontSize: "28px", marginBottom: "16px", color: "rgba(140,190,255,0.8)" }}>{p.icon}</div>
                 <h3 style={{ fontFamily: "'Orbitron', sans-serif", fontSize: "16px", fontWeight: 600, color: "rgba(220,235,255,0.9)", marginBottom: "12px", letterSpacing: "0.06em" }}>{p.title}</h3>
                 <p style={{ fontFamily: "'Rajdhani', sans-serif", fontSize: "15px", lineHeight: 1.7, color: "rgba(160,200,255,0.65)", margin: 0, fontWeight: 400 }}>{p.desc}</p>
-              </HoverCard>
+              </InteractiveCard>
             </Reveal>
           ))}
         </div>
@@ -930,21 +992,10 @@ function Achievements() {
                     boxShadow: "0 0 12px rgba(100,150,255,0.8)",
                   }} />
 
-                  <HoverCard
-                    style={{
-                      width: "calc(50% - 36px)",
-                      background: "rgba(255,255,255,0.03)",
-                      border: "1px solid transparent",
-                      borderRadius: "8px",
-                      padding: "24px 24px",
-                      backdropFilter: "blur(20px)",
-                      cursor: "default",
-                    }}
-                    hoverStyle={{
-                      background: "rgba(255,255,255,0.05)",
-                    }}
-                    particleColor="rgba(150,200,255,0.36)"
-                  >
+                  <InteractiveCard style={{
+                    width: "calc(50% - 36px)",
+                    padding: "24px 24px",
+                  }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "10px", flexWrap: "wrap", gap: "8px" }}>
                       <span style={{
                         fontFamily: "'Rajdhani', sans-serif", fontSize: "10px", letterSpacing: "0.3em", textTransform: "uppercase",
@@ -956,7 +1007,7 @@ function Achievements() {
                     </div>
                     <h3 style={{ fontFamily: "'Orbitron', sans-serif", fontSize: "14px", fontWeight: 600, color: "rgba(220,235,255,0.9)", margin: "0 0 10px", letterSpacing: "0.04em" }}>{item.title}</h3>
                     <p style={{ fontFamily: "'Rajdhani', sans-serif", fontSize: "14px", lineHeight: 1.65, color: "rgba(150,190,255,0.6)", margin: 0 }}>{item.desc}</p>
-                  </HoverCard>
+                  </InteractiveCard>
                 </div>
               </Reveal>
             );
@@ -967,217 +1018,144 @@ function Achievements() {
   );
 }
 
-function HoverCard({ children, style, hoverStyle = {}, particleColor = "rgba(150,200,255,0.4)" }) {
-  const [hovered, setHovered] = useState(false);
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
-
-  const handleMove = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientY - rect.top) / rect.height - 0.5) * 12;
-    const y = -((e.clientX - rect.left) / rect.width - 0.5) * 12;
-    setTilt({ x, y });
-  };
-
-  return (
-    <div
-      onMouseMove={handleMove}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => {
-        setHovered(false);
-        setTilt({ x: 0, y: 0 });
-      }}
-      style={{
-        ...style,
-        transform: `perspective(600px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateY(${hovered ? -4 : 0}px)`,
-        transition: cardTransition,
-        borderColor: hovered && hoverStyle.borderColor ? hoverStyle.borderColor : style.borderColor,
-        background: hovered && hoverStyle.background ? hoverStyle.background : style.background,
-        boxShadow: hovered ? `0 0 20px ${particleColor}` : "none",
-        position: "relative",
-        overflow: "hidden",
-      }}
-    >
-      {hovered && (
-        <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
-          {Array.from({ length: 12 }, (_, i) => (
-            <div
-              key={i}
-              style={{
-                position: "absolute",
-                left: `${10 + (i * 37) % 80}%`,
-                top: `${5 + (i * 53) % 90}%`,
-                width: "2px",
-                height: "2px",
-                borderRadius: "50%",
-                background: particleColor,
-              }}
-            />
-          ))}
-        </div>
-      )}
-      <div style={{ position: "relative", zIndex: 1, height: "100%", width: "100%" }}>
-        {children}
-      </div>
-    </div>
-  );
-}
-
 // ─── EVENTS ───────────────────────────────────────────────────────────────────
 function Events() {
   const [activeTab, setActiveTab] = useState("Past");
   const events = [
-  {
-    title: "Curiosity Lab - Project Expo",
-    type: "Project Expo",
-    date: "Apr 24, 2025",
-    desc: "A project showcase event where students presented their ideas and innovations, marking the conclusion of the Curiosity Lab initiative.",
-    status: "Past"
-  },
-
-  {
-    title: "Build&Break: AI Agents",
-    type: "AI Workshop",
-    date: "Jun 24, 2025",
-    desc: "An introductory workshop on AI agents where students explored challenges in AI systems and built simple AI agents hands-on.",
-    status: "Past"
-  },
-
-  {
-    title: "Tailwind Takeoff",
-    type: "Web Development",
-    date: "Jul 26, 2025",
-    desc: "A beginner-friendly session introducing TailwindCSS and practical UI development using HTML and React.",
-    status: "Past"
-  },
-
-  {
-    title: "Promptsmiths - Forge your own AI",
-    type: "AI/LLM Workshop",
-    date: "Aug 18, 2025",
-    desc: "Students learned how language models work and customized their own LLMs using Ollama tools.",
-    status: "Past"
-  },
-
-  {
-    title: "Pixel Laura",
-    type: "Photography Contest",
-    date: "Aug 19, 2025",
-    desc: "A creative photography event designed to encourage participants to showcase their skills through themed challenges.",
-    status: "Past"
-  },
-
-  {
-    title: "Inside the Black Box - How Machines Actually Learn",
-    type: "Machine Learning",
-    date: "Aug 23, 2025",
-    desc: "A session explaining the fundamentals of machine learning and how AI models learn from data.",
-    status: "Past"
-  },
-
-  {
-    title: "Art of Pitching",
-    type: "Soft Skills",
-    date: "Sep 19, 2025",
-    desc: "A workshop focused on improving pitching skills, communication clarity, and judge engagement techniques.",
-    status: "Past"
-  },
-
-  {
-    title: "Renaissance",
-    type: "Club Inauguration",
-    date: "Sep 29, 2025",
-    desc: "The official club inauguration event introducing members, vision, and guest speakers from the industry.",
-    status: "Past"
-  },
-
-  {
-    title: "Docker Demystified",
-    type: "DevOps Workshop",
-    date: "Oct 09, 2025",
-    desc: "A hands-on Docker session teaching students container creation, Dockerfiles, and image management basics.",
-    status: "Past"
-  },
-
-  {
-    title: "QUBIT - World Of Quantum Computing",
-    type: "Quantum Computing",
-    date: "Oct 11, 2025",
-    desc: "A beginner-oriented session simplifying quantum computing concepts and introducing core ideas.",
-    status: "Past"
-  },
-
-  {
-    title: "N8N - Hands on Workshop",
-    type: "Automation Workshop",
-    date: "Oct 12, 2025",
-    desc: "An automation workshop where students built no-code workflows and explored automation fundamentals live.",
-    status: "Past"
-  },
-
-  {
-    title: "IoT Connect",
-    type: "IoT Workshop",
-    date: "Oct 15, 2025",
-    desc: "Participants learned IoT communication protocols and streamed live IoT data through local server setups.",
-    status: "Past"
-  },
-
-  {
-    title: "N8N - Contest",
-    type: "Technical Contest",
-    date: "Oct 22, 2025",
-    desc: "A follow-up contest allowing students to apply and showcase the automation skills learned during the workshop.",
-    status: "Past"
-  },
-
-  {
-    title: "Journey of a Byte",
-    type: "Networking",
-    date: "Nov 29, 2025",
-    desc: "A networking fundamentals session explaining how internet communication works and how data flows online.",
-    status: "Past"
-  },
-
-  {
-    title: "Dec Learnathon - IoT Journey",
-    type: "IoT Learnathon",
-    date: "Dec 01, 2025",
-    desc: "Students explored electronics basics, IoT concepts, and created live simulations using Tinkercad and Wokwi.",
-    status: "Past"
-  },
-
-  {
-    title: "Dec Learnathon - Power of FlutterFlow",
-    type: "App Development",
-    date: "Dec 09, 2025",
-    desc: "A no-code app development session teaching participants to build real, functional apps using FlutterFlow.",
-    status: "Past"
-  },
-
-  {
-    title: "Dec Learnathon - Boot into Linux",
-    type: "Linux Workshop",
-    date: "Dec 15, 2025",
-    desc: "A Linux fundamentals workshop introducing virtual machines, command-line tools, and core Linux concepts.",
-    status: "Past"
-  },
-
-  {
-    title: "Dec Learnathon - Detect-A-Thon",
-    type: "Computer Vision",
-    date: "Dec 21, 2025",
-    desc: "A computer vision session where students explored datasets, object detection models, and real-time training workflows.",
-    status: "Past"
-  },
-
-  {
-    title: "Web Launch – Build & Launch Your Website using WordPress",
-    type: "Web Development",
-    date: "Mar 15, 2026",
-    desc: "A no-code website development workshop where students learned to create and launch websites using WordPress, along with basics of free hosting and subdomains.",
-    status: "Past"
-  }
-];
+    {
+      title: "Curiosity Lab - Project Expo",
+      type: "Project Expo",
+      date: "Apr 24, 2025",
+      desc: "A project showcase event where students presented their ideas and innovations, marking the conclusion of the Curiosity Lab initiative.",
+      status: "Past"
+    },
+    {
+      title: "Build&Break: AI Agents",
+      type: "AI Workshop",
+      date: "Jun 24, 2025",
+      desc: "An introductory workshop on AI agents where students explored challenges in AI systems and built simple AI agents hands-on.",
+      status: "Past"
+    },
+    {
+      title: "Tailwind Takeoff",
+      type: "Web Development",
+      date: "Jul 26, 2025",
+      desc: "A beginner-friendly session introducing TailwindCSS and practical UI development using HTML and React.",
+      status: "Past"
+    },
+    {
+      title: "Promptsmiths - Forge your own AI",
+      type: "AI/LLM Workshop",
+      date: "Aug 18, 2025",
+      desc: "Students learned how language models work and customized their own LLMs using Ollama tools.",
+      status: "Past"
+    },
+    {
+      title: "Pixel Laura",
+      type: "Photography Contest",
+      date: "Aug 19, 2025",
+      desc: "A creative photography event designed to encourage participants to showcase their skills through themed challenges.",
+      status: "Past"
+    },
+    {
+      title: "Inside the Black Box - How Machines Actually Learn",
+      type: "Machine Learning",
+      date: "Aug 23, 2025",
+      desc: "A session explaining the fundamentals of machine learning and how AI models learn from data.",
+      status: "Past"
+    },
+    {
+      title: "Art of Pitching",
+      type: "Soft Skills",
+      date: "Sep 19, 2025",
+      desc: "A workshop focused on improving pitching skills, communication clarity, and judge engagement techniques.",
+      status: "Past"
+    },
+    {
+      title: "Renaissance",
+      type: "Club Inauguration",
+      date: "Sep 29, 2025",
+      desc: "The official club inauguration event introducing members, vision, and guest speakers from the industry.",
+      status: "Past"
+    },
+    {
+      title: "Docker Demystified",
+      type: "DevOps Workshop",
+      date: "Oct 09, 2025",
+      desc: "A hands-on Docker session teaching students container creation, Dockerfiles, and image management basics.",
+      status: "Past"
+    },
+    {
+      title: "QUBIT - World Of Quantum Computing",
+      type: "Quantum Computing",
+      date: "Oct 11, 2025",
+      desc: "A beginner-oriented session simplifying quantum computing concepts and introducing core ideas.",
+      status: "Past"
+    },
+    {
+      title: "N8N - Hands on Workshop",
+      type: "Automation Workshop",
+      date: "Oct 12, 2025",
+      desc: "An automation workshop where students built no-code workflows and explored automation fundamentals live.",
+      status: "Past"
+    },
+    {
+      title: "IoT Connect",
+      type: "IoT Workshop",
+      date: "Oct 15, 2025",
+      desc: "Participants learned IoT communication protocols and streamed live IoT data through local server setups.",
+      status: "Past"
+    },
+    {
+      title: "N8N - Contest",
+      type: "Technical Contest",
+      date: "Oct 22, 2025",
+      desc: "A follow-up contest allowing students to apply and showcase the automation skills learned during the workshop.",
+      status: "Past"
+    },
+    {
+      title: "Journey of a Byte",
+      type: "Networking",
+      date: "Nov 29, 2025",
+      desc: "A networking fundamentals session explaining how internet communication works and how data flows online.",
+      status: "Past"
+    },
+    {
+      title: "Dec Learnathon - IoT Journey",
+      type: "IoT Learnathon",
+      date: "Dec 01, 2025",
+      desc: "Students explored electronics basics, IoT concepts, and created live simulations using Tinkercad and Wokwi.",
+      status: "Past"
+    },
+    {
+      title: "Dec Learnathon - Power of FlutterFlow",
+      type: "App Development",
+      date: "Dec 09, 2025",
+      desc: "A no-code app development session teaching participants to build real, functional apps using FlutterFlow.",
+      status: "Past"
+    },
+    {
+      title: "Dec Learnathon - Boot into Linux",
+      type: "Linux Workshop",
+      date: "Dec 15, 2025",
+      desc: "A Linux fundamentals workshop introducing virtual machines, command-line tools, and core Linux concepts.",
+      status: "Past"
+    },
+    {
+      title: "Dec Learnathon - Detect-A-Thon",
+      type: "Computer Vision",
+      date: "Dec 21, 2025",
+      desc: "A computer vision session where students explored datasets, object detection models, and real-time training workflows.",
+      status: "Past"
+    },
+    {
+      title: "Web Launch – Build & Launch Your Website using WordPress",
+      type: "Web Development",
+      date: "Mar 15, 2026",
+      desc: "A no-code website development workshop where students learned to create and launch websites using WordPress, along with basics of free hosting and subdomains.",
+      status: "Past"
+    }
+  ];
 
   const tabs = ["Past", "Upcoming"];
   const visibleEvents = events.filter((event) => event.status === activeTab);
@@ -1200,15 +1178,12 @@ function Events() {
           </div>
         </Reveal>
 
+        {/* Tab switcher */}
         <div style={{ display: "flex", justifyContent: "center", marginBottom: "40px" }}>
           <div style={{
-            display: "inline-flex",
-            padding: "6px",
-            gap: "6px",
-            borderRadius: "999px",
-            background: "rgba(255,255,255,0.04)",
-            border: "1px solid rgba(100,150,255,0.16)",
-            backdropFilter: "blur(18px)",
+            display: "inline-flex", padding: "6px", gap: "6px",
+            borderRadius: "999px", background: "rgba(255,255,255,0.04)",
+            border: "1px solid rgba(100,150,255,0.16)", backdropFilter: "blur(18px)",
           }}>
             {tabs.map((tab) => {
               const isActive = activeTab === tab;
@@ -1218,17 +1193,12 @@ function Events() {
                   type="button"
                   onClick={() => setActiveTab(tab)}
                   style={{
-                    padding: "10px 20px",
-                    borderRadius: "999px",
+                    padding: "10px 20px", borderRadius: "999px",
                     border: "1px solid transparent",
                     background: isActive ? "linear-gradient(135deg, rgba(80,120,255,0.28), rgba(80,120,255,0.12))" : "transparent",
                     color: isActive ? "rgba(230,240,255,0.95)" : "rgba(160,190,235,0.7)",
-                    fontFamily: "'Rajdhani', sans-serif",
-                    fontSize: "13px",
-                    fontWeight: 700,
-                    letterSpacing: "0.2em",
-                    textTransform: "uppercase",
-                    cursor: "pointer",
+                    fontFamily: "'Rajdhani', sans-serif", fontSize: "13px", fontWeight: 700,
+                    letterSpacing: "0.2em", textTransform: "uppercase", cursor: "pointer",
                     transition: "all 0.25s ease",
                     boxShadow: isActive ? "0 8px 24px rgba(30,60,140,0.22)" : "none",
                   }}
@@ -1240,6 +1210,7 @@ function Events() {
           </div>
         </div>
 
+        {/* Event grid */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "20px" }}>
           {visibleEvents.length > 0 ? visibleEvents.map((ev, i) => (
             <Reveal key={i} delay={i * 0.08}>
@@ -1247,16 +1218,10 @@ function Events() {
             </Reveal>
           )) : (
             <div style={{
-              gridColumn: "1 / -1",
-              textAlign: "center",
-              padding: "48px 24px",
-              border: "1px solid rgba(100,150,255,0.15)",
-              borderRadius: "8px",
-              background: "rgba(255,255,255,0.03)",
-              backdropFilter: "blur(20px)",
-              color: "rgba(160,190,235,0.75)",
-              fontFamily: "'Rajdhani', sans-serif",
-              fontSize: "16px",
+              gridColumn: "1 / -1", textAlign: "center", padding: "48px 24px",
+              border: "1px solid rgba(100,150,255,0.15)", borderRadius: "8px",
+              background: "rgba(255,255,255,0.03)", backdropFilter: "blur(20px)",
+              color: "rgba(160,190,235,0.75)", fontFamily: "'Rajdhani', sans-serif", fontSize: "16px",
             }}>
               No upcoming events scheduled yet.
             </div>
@@ -1268,31 +1233,12 @@ function Events() {
 }
 
 function EventCard({ ev, statusColor }) {
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
-  const handleMove = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientY - rect.top) / rect.height - 0.5) * 12;
-    const y = -((e.clientX - rect.left) / rect.width - 0.5) * 12;
-    setTilt({ x, y });
-  };
   return (
-    <div
-      onMouseMove={handleMove}
-      onMouseLeave={() => setTilt({ x: 0, y: 0 })}
-      style={{
-        background: "rgba(255,255,255,0.03)",
-        border: "1px solid rgba(100,150,255,0.15)",
-        borderRadius: "8px", padding: "28px 24px",
-        backdropFilter: "blur(20px)",
-        transform: `perspective(600px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
-        transition: cardTransition,
-        cursor: "default",
-        display: "flex", flexDirection: "column",
-        background: "rgba(255,255,255,0.03)",
-      }}
-      onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(100,150,255,0.35)"; e.currentTarget.style.background = "rgba(255,255,255,0.05)"; }}
-      onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(100,150,255,0.15)"; e.currentTarget.style.background = "rgba(255,255,255,0.03)"; }}
-    >
+    <InteractiveCard style={{
+      padding: "28px 24px",
+      display: "flex",
+      flexDirection: "column",
+    }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", flexWrap: "wrap", gap: "8px" }}>
         <span style={{
           fontFamily: "'Rajdhani', sans-serif", fontSize: "10px", letterSpacing: "0.25em", textTransform: "uppercase",
@@ -1319,7 +1265,7 @@ function EventCard({ ev, statusColor }) {
       >
         Learn More →
       </button>
-    </div>
+    </InteractiveCard>
   );
 }
 
@@ -1362,78 +1308,36 @@ function Team() {
 
 function MemberCard({ m, highlight }) {
   const [hovered, setHovered] = useState(false);
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const avatarColors = ["rgba(60,100,255,0.5)", "rgba(80,50,200,0.5)", "rgba(30,120,200,0.5)", "rgba(50,160,180,0.5)", "rgba(100,60,220,0.5)", "rgba(40,100,180,0.5)"];
   const color = avatarColors[m.initials.charCodeAt(0) % avatarColors.length];
 
-  const handleMove = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientY - rect.top) / rect.height - 0.5) * 12;
-    const y = -((e.clientX - rect.left) / rect.width - 0.5) * 12;
-    setTilt({ x, y });
-  };
-
   return (
-    <div
-      onMouseMove={handleMove}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => {
-        setHovered(false);
-        setTilt({ x: 0, y: 0 });
-      }}
-      style={{
-        background: "rgba(255,255,255,0.03)",
-        border: `1px solid ${hovered ? "rgba(100,150,255,0.35)" : "rgba(100,150,255,0.13)"}`,
-        borderRadius: "8px", padding: "28px 20px",
-        backdropFilter: "blur(20px)",
-        textAlign: "center",
-        transform: `perspective(600px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateY(${hovered ? -4 : 0}px)`,
-        transition: cardTransition,
-        position: "relative", overflow: "hidden",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-        minHeight: "300px",
-        height: "100%",
-        background: hovered ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.03)",
-      }}
-    >
-      {hovered && (
-        <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
-          {Array.from({ length: 12 }, (_, i) => (
-            <div key={i} style={{
-              position: "absolute",
-              left: `${10 + (i * 37) % 80}%`, top: `${5 + (i * 53) % 90}%`,
-              width: "2px", height: "2px", borderRadius: "50%",
-              background: "rgba(150,200,255,0.4)",
-            }} />
-          ))}
-        </div>
-      )}
+    <InteractiveCard onHoverChange={setHovered} style={{
+      padding: "28px 20px",
+      textAlign: "center",
+    }}>
 
-      <div>
-        <div style={{
-          width: highlight ? "72px" : "60px",
-          height: highlight ? "72px" : "60px",
-          borderRadius: "50%", margin: "0 auto 16px",
-          background: color,
-          border: `2px solid ${hovered ? "rgba(150,200,255,0.6)" : "rgba(100,150,255,0.25)"}`,
-          display: "flex", alignItems: "center", justifyContent: "center",
-          fontFamily: "'Orbitron', sans-serif",
-          fontSize: highlight ? "18px" : "15px", fontWeight: 700,
-          color: "rgba(220,235,255,0.9)",
-          transition: "border-color 0.3s",
-          boxShadow: hovered ? `0 0 20px ${color}` : "none",
-          position: "relative",
-        }}>
-          {m.initials}
-        </div>
-
-        <div style={{ fontFamily: "'Orbitron', sans-serif", fontSize: highlight ? "14px" : "12px", fontWeight: 600, color: "rgba(220,235,255,0.9)", marginBottom: "6px", letterSpacing: "0.04em" }}>{m.name}</div>
-        <div style={{ fontFamily: "'Rajdhani', sans-serif", fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(130,180,255,0.6)" }}>{m.role}</div>
+      <div style={{
+        width: highlight ? "72px" : "60px",
+        height: highlight ? "72px" : "60px",
+        borderRadius: "50%", margin: "0 auto 16px",
+        background: color,
+        border: `2px solid ${hovered ? "rgba(150,200,255,0.6)" : "rgba(100,150,255,0.25)"}`,
+        display: "flex", alignItems: "center", justifyContent: "center",
+        fontFamily: "'Orbitron', sans-serif",
+        fontSize: highlight ? "18px" : "15px", fontWeight: 700,
+        color: "rgba(220,235,255,0.9)",
+        transition: "border-color 0.3s",
+        boxShadow: hovered ? `0 0 20px ${color}` : "none",
+        position: "relative",
+      }}>
+        {m.initials}
       </div>
 
-      <div style={{ display: "flex", justifyContent: "center", gap: "12px", marginTop: "20px" }}>
+      <div style={{ fontFamily: "'Orbitron', sans-serif", fontSize: highlight ? "14px" : "12px", fontWeight: 600, color: "rgba(220,235,255,0.9)", marginBottom: "6px", letterSpacing: "0.04em" }}>{m.name}</div>
+      <div style={{ fontFamily: "'Rajdhani', sans-serif", fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(130,180,255,0.6)" }}>{m.role}</div>
+
+      <div style={{ display: "flex", justifyContent: "center", gap: "12px", marginTop: "14px" }}>
         {["in", "gh", "tw"].map((s, i) => (
           <div key={i} className="clickable" style={{
             width: "26px", height: "26px", borderRadius: "50%",
@@ -1448,7 +1352,7 @@ function MemberCard({ m, highlight }) {
           >{s}</div>
         ))}
       </div>
-    </div>
+    </InteractiveCard>
   );
 }
 
@@ -1497,11 +1401,7 @@ function Contact() {
         </Reveal>
 
         <Reveal delay={0.1}>
-          <div style={{
-            background: "rgba(255,255,255,0.03)", border: "1px solid rgba(100,150,255,0.15)",
-            borderRadius: "8px", padding: "40px 36px", backdropFilter: "blur(20px)",
-            position: "relative",
-          }}>
+          <InteractiveCard style={{ padding: "40px 36px" }}>
             <ParticleBurst active={burst} onDone={() => {}} />
 
             {sent ? (
@@ -1560,7 +1460,7 @@ function Contact() {
                 </button>
               </div>
             )}
-          </div>
+          </InteractiveCard>
         </Reveal>
       </div>
     </section>
@@ -1596,8 +1496,6 @@ function Footer() {
   );
 }
 
-// Cursor is provided by `src/components/CustomCursor.jsx` (imported at top)
-
 // ─── ROOT APP ─────────────────────────────────────────────────────────────────
 export default function App() {
   const [introComplete, setIntroComplete] = useState(false);
@@ -1613,16 +1511,14 @@ export default function App() {
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
-        * { box-sizing: border-box; margin: 0; padding: 0; cursor: none !important; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
         body {
           background: #02040e;
           color: rgba(200,220,255,0.85);
           overflow-x: hidden;
-          cursor: none;
         }
         a, button, input, textarea, select, label, [role='button'], .clickable {
-          cursor: none !important;
         }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: #02040e; }
@@ -1668,7 +1564,6 @@ export default function App() {
         }
       `}</style>
 
-      <CustomCursor />
       <Intro onComplete={handleIntroComplete} />
 
       {introComplete && (
